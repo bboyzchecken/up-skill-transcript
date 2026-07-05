@@ -53,16 +53,19 @@ interface Seg {
   stroke: string
   fontSize: number
   rotate: boolean
+  showText: boolean
 }
 
 export function SunburstWheel({
   size = 460,
   domains = DOMAINS,
   showCodes = true,
+  showLegend = true,
 }: {
   size?: number
   domains?: Domain[]
   showCodes?: boolean
+  showLegend?: boolean
 }) {
   const cx = size / 2
   const cy = size / 2
@@ -96,6 +99,7 @@ export function SunburstWheel({
       stroke: '#fff',
       fontSize: 11.5,
       rotate: false,
+      showText: false, // ชื่อโดเมนย้ายไป legend แทน (กันตัวอักษรทับกันกลางวง)
     })
 
     let gCursor = dA0
@@ -112,6 +116,7 @@ export function SunburstWheel({
         stroke: '#fff',
         fontSize: 10,
         rotate: false,
+        showText: true,
       })
 
       if (showCodes) {
@@ -129,6 +134,7 @@ export function SunburstWheel({
             stroke: '#fff',
             fontSize: 7.5,
             rotate: true,
+            showText: true,
           })
           cCursor = cA1
         }
@@ -139,16 +145,25 @@ export function SunburstWheel({
   }
 
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox={`0 0 ${size} ${size}`}
-      style={{ display: 'block', maxWidth: '100%' }}
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 14,
+        width: '100%',
+      }}
     >
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        style={{ display: 'block', maxWidth: '100%', height: 'auto' }}
+      >
       {segs.map((s, i) => (
         <path key={i} d={s.path} fill={s.fill} stroke={s.stroke} strokeWidth={1} />
       ))}
-      {segs.map((s, i) => {
+      {segs.filter((s) => s.showText).map((s, i) => {
         const [x, y] = polar(cx, cy, s.rMid, s.mid)
         let deg = (s.mid * 180) / Math.PI
         if (s.rotate) {
@@ -201,6 +216,43 @@ export function SunburstWheel({
       >
         Competency
       </text>
-    </svg>
+      </svg>
+
+      {showLegend && (
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            gap: '7px 14px',
+            maxWidth: size + 40,
+          }}
+        >
+          {domains.map((d) => (
+            <span
+              key={d.key}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                fontSize: 12.5,
+                color: 'var(--ink)',
+              }}
+            >
+              <span
+                style={{
+                  width: 11,
+                  height: 11,
+                  borderRadius: 3,
+                  background: d.color,
+                  flex: 'none',
+                }}
+              />
+              {d.label}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }

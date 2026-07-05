@@ -158,53 +158,71 @@ function TranscriptView({ studentId }: { studentId: string }) {
   const st = tr.student
   return (
     <div>
-      {/* hero */}
-      <div className="hero" style={{ padding: 28 }}>
+      {/* hero — profile นิสิต (responsive) */}
+      <div className="hero" style={{ padding: 'clamp(18px, 4vw, 28px)' }}>
         <ConstellationBg seed={st.avatarHue} />
-        <div
-          className="row wrap between"
-          style={{ position: 'relative', gap: 16 }}
-        >
-          <div className="row gap-sm">
-            <Avatar student={st} size={58} />
-            <div>
-              <span className="eyebrow" style={{ color: 'var(--gold-soft)' }}>
-                <Link to="/me" style={{ color: 'inherit' }}>
-                  ← เปลี่ยนนิสิต
-                </Link>
-              </span>
-              <h1 style={{ fontSize: 26, marginTop: 2 }}>{fullName(st)}</h1>
-              <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13.5 }}>
-                <span className="mono">{st.studentCode}</span> · {st.major} · ปี{' '}
-                {st.year}
-              </p>
-            </div>
-          </div>
+        <div style={{ position: 'relative' }}>
+          <span className="eyebrow" style={{ color: 'var(--gold-soft)' }}>
+            <Link to="/me" style={{ color: 'inherit' }}>
+              ← เปลี่ยนนิสิต
+            </Link>
+          </span>
           <div
-            style={{
-              textAlign: 'right',
-              color: 'rgba(255,255,255,0.85)',
-            }}
+            className="row wrap between"
+            style={{ gap: '14px 20px', marginTop: 10, alignItems: 'flex-end' }}
           >
-            <div style={{ fontSize: 12 }}>เข้าร่วมแล้ว</div>
             <div
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 30,
-                fontWeight: 700,
-                color: '#fff',
-              }}
+              className="row gap-sm"
+              style={{ minWidth: 0, flex: '1 1 240px' }}
             >
-              {tr.completedCount}
-              <span style={{ fontSize: 14, fontWeight: 400 }}> กิจกรรม</span>
+              <Avatar student={st} size={52} />
+              <div style={{ minWidth: 0 }}>
+                <h1
+                  style={{
+                    fontSize: 'clamp(19px, 5vw, 26px)',
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {fullName(st)}
+                </h1>
+                <p
+                  style={{
+                    color: 'rgba(255,255,255,0.8)',
+                    fontSize: 13,
+                    marginTop: 3,
+                  }}
+                >
+                  <span className="mono">{st.studentCode}</span> · {st.major} ·
+                  ปี {st.year}
+                </p>
+              </div>
             </div>
-            <a
-              href={withBase(`/me/${st.id}/portfolio`)}
-              className="btn btn-gold btn-sm"
-              style={{ marginTop: 10 }}
+            <div
+              className="row wrap"
+              style={{ gap: 14, alignItems: 'center', color: 'rgba(255,255,255,0.85)' }}
             >
-              พิมพ์ BCA Portfolio →
-            </a>
+              <div>
+                <div style={{ fontSize: 12 }}>เข้าร่วมแล้ว</div>
+                <div
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 'clamp(24px, 6vw, 30px)',
+                    fontWeight: 700,
+                    color: '#fff',
+                    lineHeight: 1,
+                  }}
+                >
+                  {tr.completedCount}
+                  <span style={{ fontSize: 14, fontWeight: 400 }}> กิจกรรม</span>
+                </div>
+              </div>
+              <a
+                href={withBase(`/me/${st.id}/portfolio`)}
+                className="btn btn-gold btn-sm"
+              >
+                พิมพ์ BCA Portfolio →
+              </a>
+            </div>
           </div>
         </div>
       </div>
