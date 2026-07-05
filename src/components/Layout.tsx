@@ -56,8 +56,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <footer className="footer">
         <div className="container footer-inner">
           <span className="credit">
-            พัฒนาโดย <strong>Owl Day House</strong> · ระบบจำลองเพื่อการนำเสนอ
-            (ข้อมูลตัวอย่างทั้งหมด)
+            พัฒนาโดย{' '}
+            <a
+              href="https://owldayhouse.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ textDecoration: 'underline' }}
+            >
+              <strong>Owl Day House</strong>
+            </a>{' '}
+            · ระบบจำลองเพื่อการนำเสนอ (ข้อมูลตัวอย่างทั้งหมด)
           </span>
           <button
             className="btn btn-ghost btn-sm"
