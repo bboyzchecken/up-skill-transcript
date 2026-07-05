@@ -5,6 +5,9 @@
 import type {
   DashboardStats,
   DimDistributionItem,
+  Dims,
+  MajorCode,
+  MajorIdentityRow,
   Participation,
   Student,
   Transcript,
@@ -20,6 +23,7 @@ import {
   top2,
   totalOf,
 } from '../lib/compute'
+import { identityLevelOf, studentIdentityPct } from '../lib/identity'
 import { buildPersona } from '../lib/persona'
 
 const TH_M = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.']
@@ -57,6 +61,9 @@ export function buildTranscript(
       b.participation.checkinAt.localeCompare(a.participation.checkinAt),
     )
 
+  const identityLevel = identityLevelOf(parts.map((p) => p.identityLevel))
+  const identityScore = studentIdentityPct(identityLevel, totals)
+
   return {
     studentId,
     student,
@@ -67,9 +74,63 @@ export function buildTranscript(
     balanceScore: balanceScore(totals),
     completedCount: parts.length,
     totalScore: totalOf(totals),
+    identityLevel,
+    identityScore,
     activities,
     persona: buildPersona(totals, hasData),
   }
+}
+
+// ── ราย­สาขา: เรดาร์เฉลี่ย 7 แกน + อันดับ Identity% ──
+function studentIdentity(state: PersistedState, studentId: string) {
+  const parts = participationsOf(state, studentId)
+  const totals = sumDims(parts.map((p) => p.dimsSnapshot))
+  const level = identityLevelOf(parts.map((p) => p.identityLevel))
+  return { totals, level, pct: studentIdentityPct(level, totals) }
+}
+
+/** เรดาร์เฉลี่ย 7 แกนของสาขา (เฉลี่ย totals ต่อนิสิต) */
+export function buildMajorRadar(
+  state: PersistedState,
+  majorCode: MajorCode,
+): Dims {
+  const list = state.students.filter((s) => s.majorCode === majorCode)
+  const out = emptyDims()
+  if (list.length === 0) return out
+  for (const s of list) {
+    const { totals } = studentIdentity(state, s.id)
+    for (const k of DIM_KEYS) out[k] += totals[k]
+  }
+  for (const k of DIM_KEYS) out[k] = Math.round((out[k] / list.length) * 10) / 10
+  return out
+}
+
+/** อันดับ Identity% ราย­สาขา (reproduce ตารางลูกค้า) */
+export function buildIdentityRanking(state: PersistedState): MajorIdentityRow[] {
+  const groups = new Map<MajorCode, { name: string; ids: string[] }>()
+  for (const s of state.students) {
+    if (!groups.has(s.majorCode))
+      groups.set(s.majorCode, { name: s.major, ids: [] })
+    groups.get(s.majorCode)!.ids.push(s.id)
+  }
+  const rows: MajorIdentityRow[] = []
+  for (const [majorCode, g] of groups) {
+    const levelCounts = new Array(7).fill(0)
+    let sum = 0
+    for (const id of g.ids) {
+      const { level, pct } = studentIdentity(state, id)
+      sum += pct
+      levelCounts[level]++
+    }
+    rows.push({
+      majorCode,
+      name: g.name,
+      n: g.ids.length,
+      identityPct: g.ids.length ? Math.round(sum / g.ids.length) : 0,
+      levelCounts,
+    })
+  }
+  return rows.sort((a, b) => b.identityPct - a.identityPct)
 }
 
 export interface ParticipantRow {

@@ -721,6 +721,192 @@ table.data tr.clickable:hover {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   BCA Portfolio / Skill Transcript — หน้าพิมพ์ A4
+   ═══════════════════════════════════════════════════════════════ */
+.portfolio-wrap {
+  max-width: 820px;
+  margin: 0 auto;
+}
+.portfolio-sheet {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  padding: 28px 30px;
+}
+.pf-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 3px solid var(--purple);
+}
+.pf-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--purple-soft);
+}
+.pf-name {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.15;
+}
+.pf-sub {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.pf-logo {
+  text-align: right;
+}
+.pf-logo-mark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--purple);
+  letter-spacing: 0.04em;
+}
+.pf-grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 14px;
+}
+.pf-box {
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 14px;
+  background: var(--surface-2);
+}
+.pf-box.center {
+  display: grid;
+  place-items: center;
+}
+.pf-boxtitle {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--purple);
+  margin-bottom: 10px;
+  width: 100%;
+}
+.pf-comp {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.pf-comp-item {
+  border-left: 3px solid var(--line-strong);
+  padding-left: 10px;
+}
+.pf-code {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--dim) 14%, white);
+  color: color-mix(in srgb, var(--dim) 60%, #2b2340);
+}
+.pf-acts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.pf-act {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px dashed var(--line);
+  font-size: 12px;
+}
+.pf-act-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.pf-lv {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--purple-soft);
+  border-radius: 5px;
+  padding: 1px 5px;
+  flex: none;
+}
+.pf-act-date {
+  color: var(--ink-faint);
+  font-size: 11px;
+  flex: none;
+}
+.pf-foot {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 10.5px;
+  color: var(--ink-faint);
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .pf-grid2 {
+    grid-template-columns: 1fr;
+  }
+  .pf-comp {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── โหมดพิมพ์ → PDF สะอาด ── */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+  body {
+    background: #fff !important;
+    background-image: none !important;
+  }
+  .nav,
+  .footer,
+  .no-print {
+    display: none !important;
+  }
+  .page {
+    padding: 0 !important;
+    animation: none !important;
+  }
+  .container {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+  .portfolio-wrap {
+    max-width: none !important;
+  }
+  .portfolio-sheet {
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+  }
+  .pf-box {
+    background: #fff !important;
+    break-inside: avoid;
+  }
+  .pf-grid2 {
+    break-inside: avoid;
+  }
+}
+
 /* layout helpers used across pages */
 .split {
   display: grid;

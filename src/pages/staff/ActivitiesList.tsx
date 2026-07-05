@@ -25,7 +25,7 @@ export function ActivitiesList() {
           <span className="eyebrow">Organizer · เจ้าหน้าที่</span>
           <h1>กิจกรรมของคณะ BCA</h1>
           <p className="sub">
-            สร้างและจัดการกิจกรรม ตั้งน้ำหนักคะแนน 6 ด้าน และดูผู้เข้าร่วมแบบเรียลไทม์
+            สร้างและจัดการกิจกรรม ตั้งน้ำหนักคะแนน 7 โดเมน + ระดับ Identity และดูผู้เข้าร่วมสด
           </p>
         </div>
         <Link to="/staff/new" className="btn btn-primary btn-lg">

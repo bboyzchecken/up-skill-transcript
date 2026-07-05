@@ -1,17 +1,23 @@
 # Skill Transcript — เดโม่ (Owl Day House × ม.พะเยา คณะ BCA)
 
-ระบบจำลอง **"ทรานสคริปต์ทักษะ"** — นิสิตเข้าร่วมกิจกรรมคณะ → แต่ละกิจกรรมให้คะแนน
-**6 ด้าน** (ความรู้ / ทักษะ / ทัศนคติ / คุณธรรม / สุนทรียภาพ / สุขภาวะ) → สรุปเป็น
-**เรดาร์ใยแมงมุม 6 แกน** ที่บอกว่านิสิตคนนี้เด่นด้านไหน และคณะควรจัดกิจกรรมด้านใดเพิ่ม
+ระบบจำลอง **"ทรานสคริปต์ทักษะ + BCA Identity"** — นิสิตเข้าร่วมกิจกรรมคณะ → แต่ละกิจกรรมให้คะแนน
+**7 โดเมน** (ความรู้ / ทักษะ / ทัศนคติ / **อุปนิสัย** / สุนทรียภาพ / จริยธรรม / สุขภาวะ) และ
+**ปลดระดับ BCA Identity (บันได LV1–6)** อัตโนมัติ → สรุปเป็น **เรดาร์ใยแมงมุม 7 แกน**,
+**บันไดผู้ประกอบการ**, **Portfolio พิมพ์ได้**, และ dashboard **Identity% ราย­สาขา** ที่ reproduce
+การวิเคราะห์มือของลูกค้าได้ (8 สาขา / 434 คน)
 
 > เดโม่เพื่อการนำเสนอปิดการขาย — ไม่ใช่ระบบ production · ข้อมูลตัวอย่างทั้งหมด (กัน PDPA)
+> อัปเกรด **BCA Identity (Tier A)** ทับ base — ดู `SKILL_TRANSCRIPT_CLAUDE_ADDENDUM.md`
 
-## สโคปตามที่ตัดสินใจ (§13)
+## สโคปตามที่ตัดสินใจ
 
-- **Character AI** = แบบ Template (personality-test style) — map top-2 ด้าน → ฉายา + คำบรรยาย (ไม่พึ่ง API)
-- **สี** = สีทางการ ม.พะเยา (ม่วง–ทอง) เป็น brand หลัก · 6 สีประจำด้านใช้แยกแกนเรดาร์/กราฟ
-- **เดโม่จอเดียว** — ไม่ต้องใช้มือถือจริง · เรียลไทม์ข้ามแท็บด้วย `storage` event (ตัด backend M6 ทิ้ง)
-- **โฟกัสคณะเดียว** = คณะบริหารธุรกิจและนิเทศศาสตร์ (BCA) · analytics แบ่งตามสาขา/ชั้นปี
+- **BCA Identity** = บันได 6 ระดับ (LV1–3 Intrapreneurship · LV4–6 Entrepreneurship) ผูกกิจกรรมจริง
+  ปลดระดับอัตโนมัติ = สูงสุดของกิจกรรมสาย Identity ที่ทำ (co-curricular = ไม่ปลดระดับ)
+- **7 โดเมน + taxonomy ย่อย** (โดเมน→กลุ่ม→โค้ด เช่น KE1/SC2) โชว์เป็น **sunburst wheel**
+- **Identity%** = สูตร placeholder (`lib/identity.ts`) ผสมระดับบันได + ความครบของ competency
+- **"Character/อุปนิสัย" คือมิติ competency ที่ 7** (ไม่ใช่ Character AI) · persona template เก็บเป็น optional
+- **สี** = สีทางการ ม.พะเยา (ม่วง–ทอง) เป็น brand หลัก · 7 สีประจำโดเมน (5 แรกตรง sunburst PDF ลูกค้า)
+- **เดโม่จอเดียว** — เรียลไทม์ข้ามแท็บด้วย `storage` event · **โฟกัสคณะเดียว** = BCA
 
 ## การรัน
 
@@ -45,11 +51,13 @@ npm run build:owl     # = VITE_BASE=/skill-transcript/ vite build
 
 ## Flow เดโม่ (สคริปต์ 5 นาที)
 
-1. **เจ้าหน้าที่** — `/staff` → สร้างกิจกรรม ตั้งสไลเดอร์ 6 ด้าน เห็นมินิเรดาร์สด → ได้ QR + join code
+1. **เจ้าหน้าที่** — `/staff` → สร้างกิจกรรม ตั้งสไลเดอร์ 7 โดเมน + เลือกระดับ Identity เห็นมินิเรดาร์สด → QR + join code
 2. **นิสิตเข้าร่วม** — เปิดหน้ากิจกรรม กดปุ่ม *"เปิดหน้าเข้าร่วม (อีกแท็บ)"* → เลือกตัวตน → ยืนยัน →
    ชื่อเด้งเข้ารายชื่อฝั่งเจ้าหน้าที่แบบเรียลไทม์
-3. **ทรานสคริปต์** — `/me` → เลือกนิสิตตัวอย่างเด่น → เรดาร์ 6 แกน + ฉายา + จุดเด่น/ควรเสริม + สมดุล
-4. **กองกิจการนิสิต** — `/dashboard` → KPI, กราฟ, ตารางนิสิต, และแท็บ *วิเคราะห์* บอกด้านที่คณะ "จัดน้อย"
+3. **ทรานสคริปต์** — `/me` → เลือกนิสิตเด่น → เรดาร์ 7 แกน (เปิด/ปิดแกนได้) + ระดับ Identity + บันได + จุดเด่น →
+   ปุ่ม *"พิมพ์ BCA Portfolio"* → หน้า A4 print-friendly (บันทึกเป็น PDF)
+4. **กองกิจการนิสิต** — `/dashboard` → KPI/กราฟ · แท็บ **BCA Identity** = ตาราง Identity% จัดอันดับ 8 สาขา +
+   เรดาร์เฉลี่ยราย­สาขา + การกระจายระดับ + **sunburst competency wheel**
 
 ปุ่ม **รีเซ็ตข้อมูลเดโม่** อยู่ที่ footer (โหลดข้อมูลตัวอย่างใหม่ในคลิกเดียว เผื่อซ้อมหลายรอบ)
 
@@ -57,17 +65,18 @@ npm run build:owl     # = VITE_BASE=/skill-transcript/ vite build
 
 ```
 src/
-  types.ts            นิยาม type กลาง (Dims 6 ด้าน, Activity, Student, ...)
-  theme.ts            สี มพ. + metadata 6 ด้าน (สี/ป้าย/ไอคอน)
+  types.ts            type กลาง (Dims 7 โดเมน, Identity, Taxonomy, Activity, Student, ...)
+  theme.ts            สี มพ. + metadata 7 โดเมน (สี/ป้าย/ไอคอน)
   store/
-    Store.ts          interface กลาง (สลับ LocalStore ↔ ApiStore ได้)
+    Store.ts          interface กลาง (+ getDomains / majorRadar / identityRanking)
     LocalStore.ts     impl บน localStorage + sync ข้ามแท็บ
-    views.ts          pure derivations (transcript / dashboard)
+    views.ts          pure derivations (transcript / dashboard / major radar / identity ranking)
     index.ts          singleton + hook useLive (reactive, sync)
-  seed/               seed data สมจริง (คณะ BCA, ~48 นิสิต, 15 กิจกรรม, ~280 การเข้าร่วม)
-  lib/                compute (เรดาร์/balance), persona (Character template), format
-  components/         Radar (SVG hand-rolled), Charts, DimSlider, QRCode, ...
-  pages/              Home · staff · join · me · dashboard
+  seed/               seed สมจริง — 8 สาขา/434 คน (reproduce เลขลูกค้า), กิจกรรม BCA + identityLevel, rich ~12
+  lib/                compute (เรดาร์/balance), identity (auto-level + Identity%), taxonomy (7 โดเมน + บันได), persona
+  components/         Radar (7 แกน, toggle), IdentityLadder, IdentityBadge, SunburstWheel, Charts, ...
+  pages/              Home · staff · join · me (+ portfolio พิมพ์ได้) · dashboard (+ แท็บ BCA Identity)
+scripts/tune-seed.ts  คาลิเบรต strength ราย­สาขา ให้ identityRanking() เข้าเป้า (±2)
 ```
 
 UI เรียกผ่าน `Store` เท่านั้น — ไม่แตะ localStorage/fetch ตรง ๆ (สลับ backend ได้โดยไม่แก้หน้าจอ)

@@ -4,10 +4,15 @@ import { useLive } from '../../store'
 import { buildTranscript } from '../../store/views'
 import { Radar } from '../../components/Radar'
 import { ConstellationBg } from '../../components/ConstellationBg'
+import { IdentityLadder } from '../../components/IdentityLadder'
+import { IdentityBadge } from '../../components/IdentityBadge'
 import { Avatar, DimTag } from '../../components/common'
 import { DimIcon } from '../../components/DimIcon'
-import { DIMS } from '../../theme'
+import { DIMS, DIM_LIST } from '../../theme'
+import { rungOf } from '../../lib/taxonomy'
 import { formatDateTh, fullName } from '../../lib/format'
+import { withBase } from '../../lib/url'
+import { DIM_KEYS } from '../../types'
 import type { DimKey } from '../../types'
 
 export function TranscriptPage() {
@@ -132,6 +137,15 @@ function TranscriptView({ studentId }: { studentId: string }) {
       return null
     }
   }, [studentId])
+  const [hidden, setHidden] = useState<Set<DimKey>>(new Set())
+  const shownAxes = DIM_KEYS.filter((k) => !hidden.has(k))
+  const toggleAxis = (k: DimKey) =>
+    setHidden((prev) => {
+      const next = new Set(prev)
+      if (next.has(k)) next.delete(k)
+      else if (DIM_KEYS.length - next.size > 3) next.add(k) // คงอย่างน้อย 3 แกน
+      return next
+    })
 
   if (!tr) {
     return (
@@ -184,6 +198,13 @@ function TranscriptView({ studentId }: { studentId: string }) {
               {tr.completedCount}
               <span style={{ fontSize: 14, fontWeight: 400 }}> กิจกรรม</span>
             </div>
+            <a
+              href={withBase(`/me/${st.id}/portfolio`)}
+              className="btn btn-gold btn-sm"
+              style={{ marginTop: 10 }}
+            >
+              พิมพ์ BCA Portfolio →
+            </a>
           </div>
         </div>
       </div>
@@ -192,15 +213,41 @@ function TranscriptView({ studentId }: { studentId: string }) {
         {/* radar */}
         <div className="card pad" style={{ display: 'grid', placeItems: 'center' }}>
           <div className="panel-title" style={{ width: '100%' }}>
-            <h3>เรดาร์ทักษะ 6 ด้าน</h3>
+            <h3>เรดาร์สมรรถนะ 7 โดเมน</h3>
             <span className="hint">เทียบกับสูงสุดในคณะ</span>
           </div>
-          <Radar values={tr.totals} max={tr.axisMax} size={360} />
+          <Radar values={tr.totals} max={tr.axisMax} size={360} axes={shownAxes} />
+          <div
+            className="row wrap"
+            style={{ gap: 6, justifyContent: 'center', marginTop: 12 }}
+          >
+            {DIM_LIST.map((d) => {
+              const on = !hidden.has(d.key)
+              return (
+                <button
+                  key={d.key}
+                  onClick={() => toggleAxis(d.key)}
+                  className="tag tag-dim"
+                  style={{
+                    ['--dim' as string]: d.color,
+                    cursor: 'pointer',
+                    opacity: on ? 1 : 0.4,
+                    border: '1px solid transparent',
+                    borderColor: on ? 'transparent' : 'var(--line)',
+                  }}
+                  title={on ? 'คลิกเพื่อซ่อนแกน' : 'คลิกเพื่อแสดงแกน'}
+                >
+                  <span className="dot" style={{ background: d.color }} />
+                  {d.short}
+                </button>
+              )
+            })}
+          </div>
         </div>
 
         {/* insights */}
         <div className="stack">
-          {/* persona (Character template) */}
+          {/* Identity card (level + score) */}
           <div
             className="card pad"
             style={{
@@ -213,42 +260,58 @@ function TranscriptView({ studentId }: { studentId: string }) {
             }}
           >
             <ConstellationBg seed={st.avatarHue + 3} />
-            <div style={{ position: 'relative' }}>
-              <span
-                className="mono"
-                style={{
-                  fontSize: 11,
-                  letterSpacing: '0.14em',
-                  color: 'var(--gold-soft)',
-                  textTransform: 'uppercase',
-                }}
-              >
-                ฉายาประจำตัว
-              </span>
-              <h2 style={{ color: '#fff', fontSize: 23, marginTop: 6 }}>
-                {tr.persona.archetype}
-              </h2>
+            <div
+              className="row wrap"
+              style={{ position: 'relative', gap: 18, alignItems: 'center' }}
+            >
               <div
                 style={{
-                  color: 'var(--gold-soft)',
-                  fontWeight: 600,
-                  fontSize: 14,
-                  marginTop: 2,
+                  background: '#fff',
+                  borderRadius: 'var(--r)',
+                  padding: '10px 12px',
                 }}
               >
-                “{tr.persona.tagline}”
+                <IdentityBadge level={tr.identityLevel} score={tr.identityScore} size={120} />
               </div>
-              <p
-                style={{
-                  color: 'rgba(255,255,255,0.86)',
-                  fontSize: 13.5,
-                  marginTop: 10,
-                  lineHeight: 1.6,
-                }}
-              >
-                {tr.persona.description}
-              </p>
+              <div className="grow" style={{ minWidth: 160 }}>
+                <span
+                  className="mono"
+                  style={{
+                    fontSize: 11,
+                    letterSpacing: '0.14em',
+                    color: 'var(--gold-soft)',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  BCA Identity
+                </span>
+                <h2 style={{ color: '#fff', fontSize: 20, marginTop: 6 }}>
+                  {tr.identityLevel === 0
+                    ? 'ยังไม่เข้าเส้น Identity'
+                    : rungOf(tr.identityLevel)?.title}
+                </h2>
+                <p
+                  style={{
+                    color: 'rgba(255,255,255,0.82)',
+                    fontSize: 12.5,
+                    marginTop: 8,
+                    lineHeight: 1.55,
+                  }}
+                >
+                  เอกลักษณ์ “ผู้ประกอบการ + นักสื่อสาร” — ปลดระดับอัตโนมัติจากกิจกรรมสาย Identity
+                  ที่เข้าร่วม
+                </p>
+              </div>
             </div>
+          </div>
+
+          {/* Identity ladder */}
+          <div className="card pad">
+            <div className="panel-title">
+              <h3>บันได Identity</h3>
+              <span className="hint">LV1–6 · Intra → Entre</span>
+            </div>
+            <IdentityLadder level={tr.identityLevel} compact />
           </div>
 
           {/* จุดเด่น / ควรเสริม */}

@@ -2,7 +2,6 @@ import type { DimKey } from './types'
 
 // ─────────────────────────────────────────────────────────────
 // สีทางการ มหาวิทยาลัยพะเยา = ม่วง–ทอง (ใช้เป็น brand chrome หลัก)
-// * ค่าเฉดปรับได้ตามคู่มืออัตลักษณ์ มพ. ฉบับล่าสุด — ยืนยันก่อนล็อกจริง
 // ─────────────────────────────────────────────────────────────
 export const UP = {
   purple: '#4A1E6E', // ม่วงพะเยาหลัก
@@ -20,58 +19,67 @@ export interface DimMeta {
   color: string
 }
 
-// 6 สีประจำด้าน = category color ของ data-viz (คงเส้นคงวาทั้งระบบ ตาม §7)
+// 7 สีประจำโดเมน = category color ของ data-viz (คงเส้นคงวาทั้งระบบ)
+// 5 สีแรกตรง sunburst ใน PDF ลูกค้า · ethics/wellness เพิ่มเข้ามา (ADDENDUM §5)
 export const DIMS: Record<DimKey, DimMeta> = {
   knowledge: {
     key: 'knowledge',
     labelTh: 'ความรู้',
     labelEn: 'Knowledge',
     short: 'ความรู้',
-    color: '#3B82F6',
+    color: '#1F5C8B',
   },
-  skills: {
-    key: 'skills',
+  skill: {
+    key: 'skill',
     labelTh: 'ทักษะ',
-    labelEn: 'Skills',
+    labelEn: 'Skill',
     short: 'ทักษะ',
-    color: '#14B8A6',
+    color: '#E67E22',
   },
   attitude: {
     key: 'attitude',
     labelTh: 'ทัศนคติ',
     labelEn: 'Attitude',
     short: 'ทัศนคติ',
-    color: '#F59E0B',
+    color: '#27AE60',
   },
-  ethics: {
-    key: 'ethics',
-    labelTh: 'คุณธรรม',
-    labelEn: 'Ethics',
-    short: 'คุณธรรม',
-    color: '#8B5CF6',
+  character: {
+    key: 'character',
+    labelTh: 'อุปนิสัย',
+    labelEn: 'Character',
+    short: 'อุปนิสัย',
+    color: '#29ABE2',
   },
   aesthetics: {
     key: 'aesthetics',
     labelTh: 'สุนทรียภาพ',
     labelEn: 'Aesthetics',
     short: 'สุนทรีย์',
-    color: '#EC4899',
+    color: '#C0399B',
+  },
+  ethics: {
+    key: 'ethics',
+    labelTh: 'จริยธรรม',
+    labelEn: 'Ethics',
+    short: 'จริยธรรม',
+    color: '#6C5CE7',
   },
   wellness: {
     key: 'wellness',
     labelTh: 'สุขภาวะ',
     labelEn: 'Wellness',
     short: 'สุขภาวะ',
-    color: '#10B981',
+    color: '#16A085',
   },
 }
 
 export const DIM_LIST: DimMeta[] = [
   DIMS.knowledge,
-  DIMS.skills,
+  DIMS.skill,
   DIMS.attitude,
-  DIMS.ethics,
+  DIMS.character,
   DIMS.aesthetics,
+  DIMS.ethics,
   DIMS.wellness,
 ]
 

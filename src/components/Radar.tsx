@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import type { Dims } from '../types'
-import { DIM_LIST } from '../theme'
+import type { Dims, DimKey } from '../types'
+import { DIMS, DIM_LIST } from '../theme'
 
 interface RadarProps {
   values: Dims
@@ -10,6 +10,8 @@ interface RadarProps {
   animate?: boolean
   /** สีเส้น/พื้น: 'brand' = ม่วง–ทอง (มพ.) */
   tone?: 'brand'
+  /** เลือกเฉพาะบางแกน (เปิด/ปิดแกนได้) — ไม่ส่ง = ครบ 7 โดเมน */
+  axes?: DimKey[]
 }
 
 function easeOutCubic(t: number) {
@@ -23,8 +25,10 @@ export function Radar({
   showLabels = true,
   animate = true,
   tone = 'brand',
+  axes,
 }: RadarProps) {
   void tone
+  const dims = axes && axes.length >= 3 ? axes.map((k) => DIMS[k]) : DIM_LIST
   const uid = useId().replace(/:/g, '')
   const [progress, setProgress] = useState(animate ? 0 : 1)
   const raf = useRef<number>()
@@ -53,7 +57,7 @@ export function Radar({
   const cx = size / 2
   const cy = size / 2
   const R = size / 2 - pad
-  const n = DIM_LIST.length
+  const n = dims.length
 
   const angle = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / n
   const pointAt = (i: number, r: number) => {
@@ -63,12 +67,12 @@ export function Radar({
 
   // rings
   const rings = [0.25, 0.5, 0.75, 1].map((f) => {
-    const pts = DIM_LIST.map((_, i) => pointAt(i, R * f).join(',')).join(' ')
+    const pts = dims.map((_, i) => pointAt(i, R * f).join(',')).join(' ')
     return { f, pts }
   })
 
   // value polygon
-  const valuePts = DIM_LIST.map((dm, i) => {
+  const valuePts = dims.map((dm, i) => {
     const frac = Math.max(0, Math.min(1, values[dm.key] / Math.max(1, max[dm.key])))
     return pointAt(i, R * frac * progress)
   })
@@ -101,7 +105,7 @@ export function Radar({
       ))}
 
       {/* axes */}
-      {DIM_LIST.map((_, i) => {
+      {dims.map((_, i) => {
         const [x, y] = pointAt(i, R)
         return (
           <line
@@ -133,14 +137,14 @@ export function Radar({
           cy={p[1]}
           r={4}
           fill="#fff"
-          stroke={DIM_LIST[i].color}
+          stroke={dims[i].color}
           strokeWidth={2.5}
         />
       ))}
 
       {/* labels */}
       {showLabels &&
-        DIM_LIST.map((dm, i) => {
+        dims.map((dm, i) => {
           const [x, y] = pointAt(i, R + 26)
           const anchor =
             Math.abs(x - cx) < 6 ? 'middle' : x > cx ? 'start' : 'end'

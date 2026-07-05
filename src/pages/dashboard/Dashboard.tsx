@@ -1,17 +1,25 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLive } from '../../store'
-import { buildDashboard } from '../../store/views'
+import {
+  buildDashboard,
+  buildIdentityRanking,
+  buildMajorRadar,
+} from '../../store/views'
 import { CountUp } from '../../components/CountUp'
 import { BarList, LineChart } from '../../components/Charts'
+import { Radar } from '../../components/Radar'
+import { SunburstWheel } from '../../components/SunburstWheel'
 import { Avatar } from '../../components/common'
 import { DimIcon } from '../../components/DimIcon'
 import { DIMS } from '../../theme'
+import { DIM_KEYS, emptyDims } from '../../types'
 import { rankDims, sumDims, totalOf } from '../../lib/compute'
+import { rungOf } from '../../lib/taxonomy'
 import { fullName } from '../../lib/format'
-import type { DimKey } from '../../types'
+import type { DimKey, Dims, MajorCode } from '../../types'
 
-type Tab = 'overview' | 'students' | 'analytics'
+type Tab = 'overview' | 'students' | 'identity' | 'analytics'
 
 export function Dashboard() {
   const [tab, setTab] = useState<Tab>('overview')
@@ -22,7 +30,7 @@ export function Dashboard() {
           <span className="eyebrow">Student Affairs · กองกิจการนิสิต</span>
           <h1>ภาพรวมการพัฒนานิสิต คณะ BCA</h1>
           <p className="sub">
-            ติดตามการมีส่วนร่วม จุดแข็งเชิงทักษะของนิสิต และด้านที่คณะควรจัดกิจกรรมเพิ่ม
+            ติดตามการมีส่วนร่วม สมรรถนะ 7 โดเมน ระดับ BCA Identity ราย­สาขา และด้านที่คณะควรจัดเพิ่ม
           </p>
         </div>
       </div>
@@ -42,6 +50,12 @@ export function Dashboard() {
             ตารางนิสิต
           </button>
           <button
+            className={tab === 'identity' ? 'active' : ''}
+            onClick={() => setTab('identity')}
+          >
+            BCA Identity
+          </button>
+          <button
             className={tab === 'analytics' ? 'active' : ''}
             onClick={() => setTab('analytics')}
           >
@@ -52,6 +66,7 @@ export function Dashboard() {
 
       {tab === 'overview' && <Overview />}
       {tab === 'students' && <StudentsTable />}
+      {tab === 'identity' && <IdentityAnalytics />}
       {tab === 'analytics' && <Analytics />}
     </div>
   )
@@ -178,7 +193,7 @@ function DimDistribution({
   return (
     <div className="card pad">
       <div className="panel-title">
-        <h3>การกระจาย 6 ด้านทั้งคณะ</h3>
+        <h3>การกระจาย 7 โดเมนทั้งคณะ</h3>
         <span className="hint">แต้มที่กิจกรรมเปิดให้</span>
       </div>
       <div className="stack" style={{ gap: 10 }}>
@@ -325,6 +340,214 @@ function StudentsTable() {
             </tbody>
           </table>
         </div>
+      </div>
+    </div>
+  )
+}
+
+// ── BCA Identity (เรดาร์ราย­สาขา + ตารางจัดอันดับ + การกระจายระดับ) ──
+const LEVEL_COLORS = [
+  '#c9c2d6', // 0
+  '#b79ad6',
+  '#9a6fce',
+  '#7a4ba8', // intra
+  '#4fb0e0',
+  '#2b93cf',
+  '#0d6ea0', // entre
+]
+
+function IdentityAnalytics() {
+  const data = useLive((s) => {
+    const ranking = buildIdentityRanking(s)
+    const radars: Record<string, Dims> = {}
+    for (const r of ranking) radars[r.majorCode] = buildMajorRadar(s, r.majorCode)
+    return { ranking, radars }
+  })
+  const [major, setMajor] = useState<MajorCode>(
+    data.ranking[0]?.majorCode ?? 'ComM',
+  )
+  const selected = data.ranking.find((r) => r.majorCode === major) ?? data.ranking[0]
+
+  // axisMax = สูงสุดต่อแกนข้ามทุกสาขา (ให้รูปทรงเรดาร์เทียบกันได้)
+  const axisMax = emptyDims()
+  for (const k of DIM_KEYS) {
+    let m = 1
+    for (const r of data.ranking) m = Math.max(m, data.radars[r.majorCode][k])
+    axisMax[k] = m
+  }
+
+  return (
+    <div className="section stack" style={{ gap: 20 }}>
+      {/* ตารางจัดอันดับ Identity% */}
+      <div className="card pad">
+        <div className="panel-title">
+          <h3>ผลการวิเคราะห์ข้อมูล · Identity% จัดอันดับตามสาขา</h3>
+          <span className="hint">434 คน · 8 สาขา</span>
+        </div>
+        <div className="table-wrap">
+          <table className="data">
+            <thead>
+              <tr>
+                <th>อันดับ</th>
+                <th>สาขา</th>
+                <th>รหัส</th>
+                <th>จำนวน</th>
+                <th style={{ minWidth: 200 }}>Identity%</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.ranking.map((r, i) => (
+                <tr
+                  key={r.majorCode}
+                  className="clickable"
+                  onClick={() => setMajor(r.majorCode)}
+                  style={
+                    r.majorCode === major
+                      ? { background: 'var(--purple-tint)' }
+                      : undefined
+                  }
+                >
+                  <td>
+                    <strong style={{ color: 'var(--purple)' }}>{i + 1}</strong>
+                  </td>
+                  <td style={{ fontWeight: 600 }}>{r.name}</td>
+                  <td className="mono faint">{r.majorCode}</td>
+                  <td className="mono">{r.n}</td>
+                  <td>
+                    <div className="row gap-sm">
+                      <div
+                        style={{
+                          flex: 1,
+                          height: 9,
+                          borderRadius: 999,
+                          background: 'var(--purple-tint)',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: `${r.identityPct}%`,
+                            height: '100%',
+                            borderRadius: 999,
+                            background:
+                              'linear-gradient(90deg, var(--purple-soft), var(--purple))',
+                          }}
+                        />
+                      </div>
+                      <span
+                        className="mono"
+                        style={{ fontWeight: 700, color: 'var(--purple)', width: 42, textAlign: 'right' }}
+                      >
+                        {r.identityPct}%
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="split">
+        {/* เรดาร์ราย­สาขา */}
+        <div className="card pad center">
+          <div className="panel-title" style={{ width: '100%' }}>
+            <h3>เรดาร์เฉลี่ย 7 โดเมน</h3>
+            <select
+              value={major}
+              onChange={(e) => setMajor(e.target.value as MajorCode)}
+              style={{ maxWidth: 200 }}
+            >
+              {data.ranking.map((r) => (
+                <option key={r.majorCode} value={r.majorCode}>
+                  {r.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          {selected && (
+            <>
+              <div
+                className="mono"
+                style={{
+                  letterSpacing: '0.14em',
+                  color: 'var(--purple-soft)',
+                  fontSize: 12,
+                  textTransform: 'uppercase',
+                  marginBottom: 4,
+                }}
+              >
+                {selected.name} · n={selected.n}
+              </div>
+              <Radar values={data.radars[major]} max={axisMax} size={330} />
+            </>
+          )}
+        </div>
+
+        {/* การกระจายระดับ Identity ของสาขา */}
+        <div className="card pad">
+          <div className="panel-title">
+            <h3>การกระจายระดับ Identity</h3>
+            <span className="hint">{selected?.name}</span>
+          </div>
+          {selected && (
+            <div className="stack" style={{ gap: 9 }}>
+              {[6, 5, 4, 3, 2, 1].map((lv) => {
+                const count = selected.levelCounts[lv]
+                const pct = selected.n ? (count / selected.n) * 100 : 0
+                const rung = rungOf(lv)!
+                return (
+                  <div key={lv}>
+                    <div className="row between" style={{ marginBottom: 3 }}>
+                      <span className="row gap-sm" style={{ fontSize: 12.5 }}>
+                        <span
+                          className="mono"
+                          style={{
+                            fontWeight: 700,
+                            color: '#fff',
+                            background: LEVEL_COLORS[lv],
+                            borderRadius: 5,
+                            padding: '0 6px',
+                            fontSize: 11,
+                          }}
+                        >
+                          LV{lv}
+                        </span>
+                        <span className="faint" style={{ fontSize: 11.5 }}>
+                          {rung.zone === 'entre' ? 'Entre' : 'Intra'} · {rung.title}
+                        </span>
+                      </span>
+                      <span className="mono" style={{ fontSize: 12, fontWeight: 600 }}>
+                        {count}
+                      </span>
+                    </div>
+                    <div style={{ height: 8, background: 'var(--purple-tint)', borderRadius: 999 }}>
+                      <div
+                        style={{
+                          width: `${pct}%`,
+                          height: '100%',
+                          borderRadius: 999,
+                          background: LEVEL_COLORS[lv],
+                          transition: 'width 0.5s ease',
+                        }}
+                      />
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Sunburst competency wheel */}
+      <div className="card pad center">
+        <div className="panel-title" style={{ width: '100%' }}>
+          <h3>แผนผัง Competency (Sunburst)</h3>
+          <span className="hint">7 โดเมน → กลุ่ม → โค้ด</span>
+        </div>
+        <SunburstWheel size={460} />
       </div>
     </div>
   )
