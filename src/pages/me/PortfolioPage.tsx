@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useLive } from '../../store'
 import { buildTranscript } from '../../store/views'
@@ -24,6 +25,17 @@ export function PortfolioPage() {
     },
     [studentId],
   )
+
+  // ชื่อไฟล์ตอน Save as PDF = document.title → ตั้งเป็นชื่อนิสิตแบบ dynamic
+  useEffect(() => {
+    if (!tr) return
+    const prev = document.title
+    const s = tr.student
+    document.title = `BCA Portfolio · ${s.firstName} ${s.lastName} · ${s.studentCode}`
+    return () => {
+      document.title = prev
+    }
+  }, [studentId, tr])
 
   if (!tr) {
     return (
@@ -125,12 +137,12 @@ export function PortfolioPage() {
         </div>
 
         {/* sunburst + กิจกรรม */}
-        <div className="pf-grid2">
+        <div className="pf-grid2 pf-grid2--stack-print">
           <div className="pf-box center">
             <div className="pf-boxtitle">แผนผัง Competency (BCA)</div>
             <SunburstWheel size={260} showCodes={false} />
           </div>
-          <div className="pf-box">
+          <div className="pf-box pf-box--flow">
             <div className="pf-boxtitle">กิจกรรมที่เข้าร่วม ({tr.activities.length})</div>
             <div className="pf-acts">
               {tr.activities.map(({ participation, activity }) => (

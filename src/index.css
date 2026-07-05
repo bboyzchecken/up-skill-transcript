@@ -949,11 +949,28 @@ table.data tr.clickable:hover {
     border-radius: 0 !important;
     padding: 0 !important;
   }
+  /* คงคอลัมน์คู่ให้กระชับ แต่แถว sunburst+กิจกรรมสลับเป็นคอลัมน์เดียวเพื่อไหลข้ามหน้าได้สวย */
+  .pf-grid2 {
+    grid-template-columns: 1fr 1fr !important;
+    break-inside: avoid;
+  }
+  .pf-grid2--stack-print {
+    grid-template-columns: 1fr !important;
+    break-inside: auto;
+  }
   .pf-box {
     background: #fff !important;
     break-inside: avoid;
   }
-  .pf-grid2 {
+  /* กล่องกิจกรรม: ให้ตัดข้ามหน้าได้ (ทีละรายการ) แทนการถูกตัดกลางกล่อง */
+  .pf-box--flow {
+    break-inside: auto;
+  }
+  .pf-acts {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  .pf-act {
     break-inside: avoid;
   }
 }
