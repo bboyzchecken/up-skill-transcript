@@ -46,8 +46,10 @@ npm run build:owl     # = VITE_BASE=/skill-transcript/ vite build
 (asset ถูก prefix `/skill-transcript/` ให้แล้ว) · ปรับ subpath อื่นได้ด้วย `VITE_BASE=/path/ npm run build`
 
 - เสิร์ฟที่ **root** (custom domain ตรง ๆ / Cloudflare `*.pages.dev`): `npm run build` เฉย ๆ (base `/`)
-- **GitHub Pages** (ทางเลือกฟรี auto-deploy): มี [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)
-  ตั้ง base = `/<repo>/` อัตโนมัติ · ครั้งแรกต้องเปิด **Settings → Pages → Source = "GitHub Actions"**
+- **GitHub Pages** (ทางเลือกฟรี auto-deploy): [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)
+  build แล้ว push `dist/` ขึ้น branch **`gh-pages`** อัตโนมัติทุกครั้งที่ push `main` (ตั้ง base = `/<repo>/` ให้แล้ว)
+  · ครั้งแรกให้ตั้ง **Settings → Pages → Source = "Deploy from a branch" → `gh-pages` / `root`** ครั้งเดียว
+  (ใช้วิธี branch แทน Pages API เพราะ `GITHUB_TOKEN` ของ Actions สร้าง Pages site เองไม่ได้ในบางรีโป)
 
 ## Flow เดโม่ (สคริปต์ 5 นาที)
 
