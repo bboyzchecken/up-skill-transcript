@@ -65,7 +65,13 @@ export function Home() {
             >
               Skill Transcript System
             </span>
-            <h1 style={{ fontSize: 38, marginTop: 12, lineHeight: 1.15 }}>
+            <h1
+              style={{
+                fontSize: 'clamp(24px, 6vw, 38px)',
+                marginTop: 12,
+                lineHeight: 1.15,
+              }}
+            >
               ทรานสคริปต์ทักษะ
               <br />
               ที่เล่าเรื่องนิสิตได้ทั้งคน
@@ -110,7 +116,7 @@ export function Home() {
             }}
           >
             <div style={{ filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.3))' }}>
-              <Radar values={demoVals} max={demoMax} size={300} />
+              <Radar values={demoVals} max={demoMax} size={300} dark />
             </div>
           </div>
         </div>

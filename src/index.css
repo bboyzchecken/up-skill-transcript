@@ -719,6 +719,40 @@ table.data tr.clickable:hover {
   .kpi .kpi-value {
     font-size: 26px;
   }
+  .kpi {
+    padding: 14px 16px;
+  }
+  .card.pad {
+    padding: 18px;
+  }
+  .hero {
+    padding: 20px;
+  }
+  .container {
+    padding: 0 16px;
+  }
+}
+
+/* มือถือ: กัน header ล้น (nav-inner สูงคงที่) → brand แถวบน, ลิงก์เป็นแถบเลื่อนแนวนอน */
+@media (max-width: 680px) {
+  .nav-inner {
+    height: auto;
+    flex-wrap: wrap;
+    padding: 10px 0;
+    gap: 10px;
+  }
+  .nav-links {
+    margin-left: 0;
+    width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+  }
+  .nav-links::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -919,6 +953,11 @@ table.data tr.clickable:hover {
   grid-template-columns: 1.4fr 1fr;
   gap: 20px;
   align-items: start;
+}
+/* กัน content ยาว (ชื่อกิจกรรม/บาร์) ดันคอลัมน์จนล้นจอมือถือ */
+.split > *,
+.split-wide > * {
+  min-width: 0;
 }
 @media (max-width: 940px) {
   .split,

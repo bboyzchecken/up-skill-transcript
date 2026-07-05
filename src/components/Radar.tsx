@@ -12,6 +12,8 @@ interface RadarProps {
   tone?: 'brand'
   /** เลือกเฉพาะบางแกน (เปิด/ปิดแกนได้) — ไม่ส่ง = ครบ 7 โดเมน */
   axes?: DimKey[]
+  /** true = วางบนพื้นเข้ม (hero) → label/เส้นเป็นโทนสว่าง ไม่จม */
+  dark?: boolean
 }
 
 function easeOutCubic(t: number) {
@@ -26,8 +28,15 @@ export function Radar({
   animate = true,
   tone = 'brand',
   axes,
+  dark = false,
 }: RadarProps) {
   void tone
+  // โทนสีปรับตามพื้นหลัง — กันตัวอักษร "จม" บน hero พื้นเข้ม
+  const ringColor = dark ? 'rgba(255,255,255,0.34)' : '#d8cfe6'
+  const axisColor = dark ? 'rgba(255,255,255,0.18)' : '#e0d8ee'
+  const shapeStroke = dark ? '#e4c766' : '#4a1e6e'
+  const labelColor = dark ? '#ffffff' : '#4a3d59'
+  const valueColor = dark ? 'rgba(255,255,255,0.66)' : '#9c94ad'
   const dims = axes && axes.length >= 3 ? axes.map((k) => DIMS[k]) : DIM_LIST
   const uid = useId().replace(/:/g, '')
   const [progress, setProgress] = useState(animate ? 0 : 1)
@@ -83,7 +92,7 @@ export function Radar({
       width={size}
       height={size}
       viewBox={`0 0 ${size} ${size}`}
-      style={{ display: 'block', maxWidth: '100%' }}
+      style={{ display: 'block', maxWidth: '100%', overflow: 'visible' }}
     >
       <defs>
         <radialGradient id={`fill-${uid}`} cx="50%" cy="50%" r="60%">
@@ -98,7 +107,7 @@ export function Radar({
           key={r.f}
           points={r.pts}
           fill="none"
-          stroke="#d8cfe6"
+          stroke={ringColor}
           strokeWidth={1}
           opacity={r.f === 1 ? 0.9 : 0.55}
         />
@@ -114,7 +123,7 @@ export function Radar({
             y1={cy}
             x2={x}
             y2={y}
-            stroke="#e0d8ee"
+            stroke={axisColor}
             strokeWidth={1}
           />
         )
@@ -124,7 +133,7 @@ export function Radar({
       <polygon
         points={valueStr}
         fill={`url(#fill-${uid})`}
-        stroke="#4a1e6e"
+        stroke={shapeStroke}
         strokeWidth={2}
         strokeLinejoin="round"
       />
@@ -158,7 +167,7 @@ export function Radar({
                 fontFamily="'IBM Plex Sans Thai', sans-serif"
                 fontSize={12.5}
                 fontWeight={600}
-                fill="#4a3d59"
+                fill={labelColor}
               >
                 {dm.short}
               </text>
@@ -168,7 +177,7 @@ export function Radar({
                 textAnchor={anchor}
                 fontFamily="'IBM Plex Mono', monospace"
                 fontSize={11}
-                fill="#9c94ad"
+                fill={valueColor}
               >
                 {values[dm.key]}
               </text>
