@@ -6,6 +6,7 @@ import { ActivityEditor } from './pages/staff/ActivityEditor'
 import { ActivityDetail } from './pages/staff/ActivityDetail'
 import { JoinPage } from './pages/join/JoinPage'
 import { TranscriptPage } from './pages/me/TranscriptPage'
+import { PortfolioPage } from './pages/me/PortfolioPage'
 import { Dashboard } from './pages/dashboard/Dashboard'
 
 export default function App() {
@@ -21,6 +22,7 @@ export default function App() {
         <Route path="/join/:code" element={<JoinPage />} />
         <Route path="/me" element={<TranscriptPage />} />
         <Route path="/me/:studentId" element={<TranscriptPage />} />
+        <Route path="/me/:studentId/portfolio" element={<PortfolioPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="*" element={<Home />} />
       </Routes>

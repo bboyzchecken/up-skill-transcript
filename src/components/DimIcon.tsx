@@ -1,6 +1,6 @@
 import type { DimKey } from '../types'
 
-// ไอคอน 6 ด้าน — SVG stroke สะอาด (ไม่ใช้ emoji ตาม §7)
+// ไอคอน 7 โดเมน — SVG stroke สะอาด (ไม่ใช้ emoji)
 const PATHS: Record<DimKey, JSX.Element> = {
   knowledge: (
     <>
@@ -8,7 +8,7 @@ const PATHS: Record<DimKey, JSX.Element> = {
       <path d="M20 5.5A2 2 0 0 0 18 4h-5v15h5a2 2 0 0 1 2 1.2z" />
     </>
   ),
-  skills: (
+  skill: (
     <>
       <path d="M14.5 5.5a3.5 3.5 0 0 0-4.9 4.2l-5 5a1.6 1.6 0 0 0 2.3 2.3l5-5a3.5 3.5 0 0 0 4.2-4.9l-2.1 2.1-1.9-1.9z" />
     </>
@@ -18,6 +18,13 @@ const PATHS: Record<DimKey, JSX.Element> = {
       <path d="M12 3v2M5 6l1.4 1.4M19 6l-1.4 1.4" />
       <path d="M9 15a4 4 0 1 1 6 0c-.5.6-1 1.2-1 2H10c0-.8-.5-1.4-1-2z" />
       <path d="M10 20h4M10.5 22h3" />
+    </>
+  ),
+  character: (
+    <>
+      {/* วินัย/อุปนิสัย — โล่กับเข็มทิศ */}
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M15 9l-1.6 4.4L9 15l1.6-4.4z" />
     </>
   ),
   ethics: (

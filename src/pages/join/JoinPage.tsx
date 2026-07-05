@@ -5,18 +5,9 @@ import { Radar } from '../../components/Radar'
 import { Avatar, DimTag } from '../../components/common'
 import { DimIcon } from '../../components/DimIcon'
 import { DIMS } from '../../theme'
-import { rankDims } from '../../lib/compute'
+import { MAX10, rankDims } from '../../lib/compute'
 import { formatDateTh, fullName } from '../../lib/format'
-import type { Dims, Participation } from '../../types'
-
-const MAX10: Dims = {
-  knowledge: 10,
-  skills: 10,
-  attitude: 10,
-  ethics: 10,
-  aesthetics: 10,
-  wellness: 10,
-}
+import type { Participation } from '../../types'
 
 export function JoinPage() {
   const params = useParams()

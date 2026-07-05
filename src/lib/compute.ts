@@ -1,6 +1,17 @@
 import { DIM_KEYS, emptyDims } from '../types'
 import type { Dims, DimKey } from '../types'
 
+/** ค่าเต็ม 10 ทุกด้าน — ใช้ตั้ง max ของเรดาร์กิจกรรม (สเกลคงที่ 0–10) */
+export const MAX10: Dims = {
+  knowledge: 10,
+  skill: 10,
+  attitude: 10,
+  character: 10,
+  aesthetics: 10,
+  ethics: 10,
+  wellness: 10,
+}
+
 /** รวมคะแนนหลายชุดเข้าด้วยกัน */
 export function sumDims(list: Dims[]): Dims {
   const out = emptyDims()

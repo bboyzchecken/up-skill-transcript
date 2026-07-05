@@ -4,19 +4,9 @@ import { QRCode } from '../../components/QRCode'
 import { Radar } from '../../components/Radar'
 import { Avatar, StatusBadge, DimTag } from '../../components/common'
 import { listParticipantsWithStudents } from '../../store/views'
-import { rankDims } from '../../lib/compute'
+import { MAX10, rankDims } from '../../lib/compute'
 import { formatDateTimeTh, formatTimeTh, fullName } from '../../lib/format'
 import { absoluteUrl, withBase } from '../../lib/url'
-import type { Dims } from '../../types'
-
-const MAX10: Dims = {
-  knowledge: 10,
-  skills: 10,
-  attitude: 10,
-  ethics: 10,
-  aesthetics: 10,
-  wellness: 10,
-}
 
 export function ActivityDetail() {
   const { id } = useParams()

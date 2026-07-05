@@ -2,7 +2,11 @@ import type {
   Activity,
   ActivityInput,
   DashboardStats,
+  Dims,
+  Domain,
   Faculty,
+  MajorCode,
+  MajorIdentityRow,
   Participation,
   Student,
   Transcript,
@@ -34,6 +38,11 @@ export interface Store {
 
   // dashboard
   dashboardStats(): Promise<DashboardStats>
+
+  // taxonomy / identity (ADDENDUM Tier A)
+  getDomains(): Promise<Domain[]>
+  majorRadar(majorCode: MajorCode): Promise<Dims>
+  identityRanking(): Promise<MajorIdentityRow[]>
 
   // admin
   seed(): Promise<void>

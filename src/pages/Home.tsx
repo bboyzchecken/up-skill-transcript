@@ -4,13 +4,14 @@ import { Radar } from '../components/Radar'
 import { useLive } from '../store'
 import { buildDashboard } from '../store/views'
 import { DIM_LIST } from '../theme'
+import { MAX10 } from '../lib/compute'
 import { DimIcon } from '../components/DimIcon'
 
 const ROLES = [
   {
     to: '/staff',
     title: 'เจ้าหน้าที่ / คณะ',
-    desc: 'สร้างกิจกรรม ตั้งคะแนน 6 ด้าน ดูผู้เข้าร่วมแบบเรียลไทม์',
+    desc: 'สร้างกิจกรรม ตั้งคะแนน 7 โดเมน + ระดับ Identity ดูผู้เข้าร่วมสด',
     tag: 'organizer',
   },
   {
@@ -22,7 +23,7 @@ const ROLES = [
   {
     to: '/me',
     title: 'ทรานสคริปต์ของฉัน',
-    desc: 'เรดาร์ 6 แกน จุดเด่น/ควรเสริม และฉายาประจำตัว',
+    desc: 'เรดาร์ 7 แกน ระดับ Identity บันได และจุดเด่น competency',
     tag: 'transcript',
   },
   {
@@ -35,23 +36,17 @@ const ROLES = [
 
 export function Home() {
   const stats = useLive((s) => buildDashboard(s))
-  // เรดาร์ตัวอย่างในหน้าแรก (ค่าคงที่สวย ๆ)
+  // เรดาร์ตัวอย่างในหน้าแรก (ค่าคงที่สวย ๆ) — 7 โดเมน
   const demoVals = {
     knowledge: 8,
-    skills: 9,
+    skill: 9,
     attitude: 7,
-    ethics: 6,
+    character: 8,
     aesthetics: 5,
+    ethics: 6,
     wellness: 7,
   }
-  const demoMax = {
-    knowledge: 10,
-    skills: 10,
-    attitude: 10,
-    ethics: 10,
-    aesthetics: 10,
-    wellness: 10,
-  }
+  const demoMax = MAX10
 
   return (
     <div>
@@ -84,9 +79,9 @@ export function Home() {
               }}
             >
               ทุกกิจกรรมของคณะบริหารธุรกิจและนิเทศศาสตร์ให้คะแนน{' '}
-              <strong style={{ color: '#fff' }}>6 ด้าน</strong> —
-              สะสมเป็นเรดาร์ใยแมงมุมที่บอกว่านิสิตคนนี้เด่นด้านไหน
-              และมหาวิทยาลัยควรเติมด้านใด
+              <strong style={{ color: '#fff' }}>7 โดเมน</strong> +
+              ปลดระดับ <strong style={{ color: '#fff' }}>BCA Identity</strong> —
+              สะสมเป็นเรดาร์ใยแมงมุมและบันไดผู้ประกอบการที่เล่าเรื่องนิสิตได้ทั้งคน
             </p>
             <div className="row wrap" style={{ marginTop: 24, gap: 10 }}>
               <Link to="/staff" className="btn btn-gold btn-lg">
@@ -121,7 +116,7 @@ export function Home() {
         </div>
       </section>
 
-      {/* 6 ด้าน strip */}
+      {/* 7 โดเมน strip */}
       <section className="section">
         <div className="row wrap" style={{ gap: 10, justifyContent: 'center' }}>
           {DIM_LIST.map((d) => (

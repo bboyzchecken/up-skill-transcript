@@ -3,26 +3,23 @@ import { useNavigate, useParams, Link } from 'react-router-dom'
 import { getStore, useLive } from '../../store'
 import { DimSliders } from '../../components/DimSlider'
 import { Radar } from '../../components/Radar'
-import { balanceScore } from '../../lib/compute'
-import type { ActivityInput, ActivityStatus, Dims } from '../../types'
+import { MAX10, balanceScore } from '../../lib/compute'
+import type { ActivityInput, ActivityStatus, IdentityLevel } from '../../types'
 import { emptyDims } from '../../types'
+import { rungOf } from '../../lib/taxonomy'
 
 const CATEGORIES = [
+  'Identity · แรงบันดาลใจ',
+  'Identity · เครื่องมือธุรกิจ',
+  'Identity · เครื่องมือสื่อสาร',
+  'Identity · วางแผนธุรกิจ',
+  'Identity · ลงมือทำธุรกิจ',
   'วิชาการ/ทักษะวิชาชีพ',
   'อาสา/บำเพ็ญประโยชน์',
   'ศิลปวัฒนธรรม',
   'กีฬา/สุขภาพ',
   'ปฐมนิเทศ',
 ]
-
-const MAX10: Dims = {
-  knowledge: 10,
-  skills: 10,
-  attitude: 10,
-  ethics: 10,
-  aesthetics: 10,
-  wellness: 10,
-}
 
 function toLocalInput(iso: string): string {
   const d = new Date(iso)
@@ -57,6 +54,7 @@ export function ActivityEditor() {
         location: existing.location,
         capacity: existing.capacity,
         dims: { ...existing.dims },
+        identityLevel: existing.identityLevel,
         status: existing.status,
       }
     }
@@ -70,6 +68,7 @@ export function ActivityEditor() {
       location: '',
       capacity: undefined,
       dims: emptyDims(),
+      identityLevel: null,
       status: 'open',
     }
   })
@@ -208,11 +207,39 @@ export function ActivityEditor() {
           </label>
         </div>
 
-        {/* ── คะแนน 6 ด้าน + มินิเรดาร์ ── */}
+        {/* ── คะแนน 7 โดเมน + ระดับ Identity + มินิเรดาร์ ── */}
         <div className="stack">
           <div className="card pad">
             <div className="panel-title">
-              <h3>ตั้งคะแนน 6 ด้าน</h3>
+              <h3>ระดับ Identity ที่กิจกรรมนี้ปลด</h3>
+              <span className="hint">บันได LV1–6</span>
+            </div>
+            <select
+              value={form.identityLevel ?? ''}
+              onChange={(e) =>
+                set(
+                  'identityLevel',
+                  e.target.value
+                    ? (Number(e.target.value) as IdentityLevel)
+                    : null,
+                )
+              }
+            >
+              <option value="">ไม่ปลดระดับ (co-curricular)</option>
+              {[1, 2, 3, 4, 5, 6].map((lv) => {
+                const r = rungOf(lv)!
+                return (
+                  <option key={lv} value={lv}>
+                    LV{lv} ({r.zone === 'intra' ? 'Intra' : 'Entre'}) — {r.title}
+                  </option>
+                )
+              })}
+            </select>
+          </div>
+
+          <div className="card pad">
+            <div className="panel-title">
+              <h3>ตั้งคะแนน 7 โดเมน</h3>
               <span className="hint">0–10 ต่อด้าน</span>
             </div>
             <DimSliders value={form.dims} onChange={(d) => set('dims', d)} />

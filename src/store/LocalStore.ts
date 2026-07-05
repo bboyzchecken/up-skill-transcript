@@ -3,15 +3,26 @@ import type {
   Activity,
   ActivityInput,
   DashboardStats,
+  Dims,
+  Domain,
   Faculty,
+  MajorCode,
+  MajorIdentityRow,
   Participation,
   Student,
   Transcript,
 } from '../types'
 import { buildSeed, type PersistedState } from '../seed/seed'
-import { buildDashboard, buildTranscript } from './views'
+import {
+  buildDashboard,
+  buildIdentityRanking,
+  buildMajorRadar,
+  buildTranscript,
+} from './views'
+import { DOMAINS } from '../lib/taxonomy'
 
-const STORAGE_KEY = 'skill-transcript:v1'
+// v2 = อัปเป็น 7 โดเมน + identity (schema เปลี่ยน → เริ่ม seed ใหม่)
+const STORAGE_KEY = 'skill-transcript:v2'
 
 function loadState(): PersistedState | null {
   try {
@@ -130,6 +141,7 @@ export class LocalStore implements Store {
       location: input.location,
       capacity: input.capacity,
       dims: { ...input.dims },
+      identityLevel: input.identityLevel ?? null,
       joinCode: genJoinCode(),
       status: input.status ?? 'open',
       createdAt: new Date().toISOString(),
@@ -174,6 +186,7 @@ export class LocalStore implements Store {
       checkinAt: new Date().toISOString(),
       status: 'checked_in',
       dimsSnapshot: { ...activity.dims },
+      identityLevel: activity.identityLevel,
     }
     this.state.participations = [...this.state.participations, p]
     this.commit()
@@ -211,6 +224,17 @@ export class LocalStore implements Store {
   // ── dashboard ──
   async dashboardStats(): Promise<DashboardStats> {
     return buildDashboard(this.state)
+  }
+
+  // ── taxonomy / identity ──
+  async getDomains(): Promise<Domain[]> {
+    return DOMAINS
+  }
+  async majorRadar(majorCode: MajorCode): Promise<Dims> {
+    return buildMajorRadar(this.state, majorCode)
+  }
+  async identityRanking(): Promise<MajorIdentityRow[]> {
+    return buildIdentityRanking(this.state)
   }
 
   // ── admin ──
