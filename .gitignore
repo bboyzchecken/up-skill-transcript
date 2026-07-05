@@ -1,0 +1,15 @@
+node_modules
+dist
+dist-ssr
+*.local
+.DS_Store
+.vite
+tsconfig.tsbuildinfo
+
+# machine-specific (absolute nvm paths, previews)
+.claude/
+
+# editor
+.vscode/*
+!.vscode/extensions.json
+.idea

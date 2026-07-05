@@ -1,0 +1,146 @@
+import type { DimKey, Dims, Persona } from '../types'
+import { top2, balanceScore } from './compute'
+
+// ─────────────────────────────────────────────────────────────
+// Character (Template-based / personality-test style) — §10, decision §13.1
+// map top-2 ด้าน → ฉายา + คำโปรย + คำบรรยาย (deterministic, ไม่พึ่ง network)
+// key = คู่ด้านเรียงตามลำดับ DIM_KEYS (ไม่สนใจว่าอันไหนมาก่อน)
+// ─────────────────────────────────────────────────────────────
+
+function pairKey(a: DimKey, b: DimKey): string {
+  return [a, b].sort().join('+')
+}
+
+interface PersonaTemplate {
+  archetype: string
+  tagline: string
+  description: string
+}
+
+const PAIR: Record<string, PersonaTemplate> = {
+  [pairKey('knowledge', 'skills')]: {
+    archetype: 'นักสร้างสายวิเคราะห์',
+    tagline: 'คิดเป็นระบบ ลงมือทำได้จริง',
+    description:
+      'เด่นทั้งความรู้และทักษะ เรียนรู้เร็วแล้วแปลงเป็นผลงานได้ทันที เหมาะกับงานที่ต้องทั้งวางแผนและสร้างของจริง เช่น พัฒนาผลิตภัณฑ์หรือโปรเจกต์ที่จับต้องได้',
+  },
+  [pairKey('knowledge', 'attitude')]: {
+    archetype: 'นักเรียนรู้หัวใจโต',
+    tagline: 'ขวนขวายและใจสู้',
+    description:
+      'มีทั้งฐานความรู้และทัศนคติเชิงบวก พร้อมเปิดรับสิ่งใหม่และไม่ยอมแพ้ง่าย เป็นคนที่ทีมอยากมีไว้ตอนงานท้าทาย',
+  },
+  [pairKey('knowledge', 'ethics')]: {
+    archetype: 'นักคิดสายธรรม',
+    tagline: 'เก่งอย่างมีหลักการ',
+    description:
+      'ใช้ความรู้ควบคู่กับความถูกต้อง ตัดสินใจบนข้อมูลและจริยธรรม เหมาะกับบทบาทที่ต้องได้รับความไว้วางใจ เช่น งานวิเคราะห์ ธรรมาภิบาล หรือที่ปรึกษา',
+  },
+  [pairKey('knowledge', 'aesthetics')]: {
+    archetype: 'นักออกแบบความคิด',
+    tagline: 'ลึกในเนื้อหา งามในรูปแบบ',
+    description:
+      'ผสานความรู้เข้ากับรสนิยม สื่อสารเรื่องยากให้สวยและเข้าใจง่าย เหมาะกับงานคอนเทนต์ แบรนด์ หรือการเล่าเรื่องด้วยข้อมูล',
+  },
+  [pairKey('knowledge', 'wellness')]: {
+    archetype: 'นักคิดสายสมดุล',
+    tagline: 'หัวไว ใจนิ่ง',
+    description:
+      'มีความรู้และดูแลตัวเองได้ดี ทำงานหนักโดยไม่หมดไฟ เป็นคนที่รักษาจังหวะชีวิตและผลงานให้ไปด้วยกันได้ในระยะยาว',
+  },
+  [pairKey('skills', 'attitude')]: {
+    archetype: 'นักลงมือใจสู้',
+    tagline: 'ทำจริง ไม่ยอมแพ้',
+    description:
+      'ทักษะแน่นบวกทัศนคติดี ลุยงานได้เลยและพาทีมไปต่อ เหมาะกับงานภาคสนามหรือสตาร์ทอัพที่ต้องปรับตัวเร็ว',
+  },
+  [pairKey('skills', 'ethics')]: {
+    archetype: 'ช่างฝีมือมีหลัก',
+    tagline: 'ทำเก่งและทำถูก',
+    description:
+      'มีทั้งฝีมือและความรับผิดชอบ ส่งงานได้คุณภาพโดยไม่ลัดขั้นตอน เป็นคนที่มอบหมายงานสำคัญให้ได้อย่างสบายใจ',
+  },
+  [pairKey('skills', 'aesthetics')]: {
+    archetype: 'นักสร้างสรรค์มือโปร',
+    tagline: 'ฝีมือดี รสนิยมเด่น',
+    description:
+      'ทักษะและสุนทรียภาพไปด้วยกัน สร้างผลงานที่ทั้งใช้ได้จริงและสวยงาม เหมาะกับงานดีไซน์ สื่อ การแสดง หรือสายครีเอทีฟ',
+  },
+  [pairKey('skills', 'wellness')]: {
+    archetype: 'นักกิจกรรมพลังบวก',
+    tagline: 'แอ็กทีฟและสมดุล',
+    description:
+      'ลงมือเก่งและดูแลสุขภาวะตัวเองได้ กระตือรือร้นแต่ไม่โหมจนพัง เหมาะกับงานที่ต้องใช้พลังต่อเนื่องและทำงานกับคน',
+  },
+  [pairKey('attitude', 'ethics')]: {
+    archetype: 'ผู้นำหัวใจอาสา',
+    tagline: 'ใจดีและมีหลักการ',
+    description:
+      'ทัศนคติบวกและคุณธรรมสูง เป็นที่พึ่งของกลุ่มและกล้ายืนหยัดในสิ่งที่ถูก เหมาะกับบทบาทผู้นำกิจกรรมหรืองานเพื่อสังคม',
+  },
+  [pairKey('attitude', 'aesthetics')]: {
+    archetype: 'นักเล่าเรื่องพลังบวก',
+    tagline: 'มองโลกสวยและสร้างแรงบันดาลใจ',
+    description:
+      'มีทัศนคติดีและสายตาเชิงสุนทรีย์ สร้างบรรยากาศและเล่าเรื่องให้คนอยากมีส่วนร่วม เหมาะกับงานอีเวนต์ การสื่อสาร และชุมชน',
+  },
+  [pairKey('attitude', 'wellness')]: {
+    archetype: 'พลังบวกประจำรุ่น',
+    tagline: 'สดใสและมีสุขภาวะ',
+    description:
+      'ทัศนคติและสุขภาวะเป็นจุดแข็ง เป็นคนที่ทำให้กลุ่มรู้สึกดีและไปต่อได้ เหมาะกับงานที่ต้องดูแลผู้คนและสร้างวัฒนธรรมที่ดี',
+  },
+  [pairKey('ethics', 'aesthetics')]: {
+    archetype: 'ศิลปินสายจริยธรรม',
+    tagline: 'สร้างงามอย่างมีความหมาย',
+    description:
+      'ผสานคุณธรรมกับสุนทรียภาพ สร้างผลงานที่สวยและมีคุณค่าต่อสังคม เหมาะกับงานศิลปวัฒนธรรม การออกแบบเพื่อชุมชน หรือสื่อสร้างสรรค์',
+  },
+  [pairKey('ethics', 'wellness')]: {
+    archetype: 'ผู้ให้สายสมดุล',
+    tagline: 'ใจดีและดูแลตัวเองเป็น',
+    description:
+      'คุณธรรมและสุขภาวะเด่น เป็นผู้ให้ที่ไม่ลืมดูแลตัวเอง เหมาะกับงานจิตอาสา สุขภาพ หรือบทบาทที่ต้องดูแลผู้อื่นอย่างยั่งยืน',
+  },
+  [pairKey('aesthetics', 'wellness')]: {
+    archetype: 'นักใช้ชีวิตอย่างมีสไตล์',
+    tagline: 'สวยงามและสมดุล',
+    description:
+      'สุนทรียภาพและสุขภาวะไปด้วยกัน ใส่ใจทั้งความงามและคุณภาพชีวิต เหมาะกับงานไลฟ์สไตล์ สุขภาพ การท่องเที่ยว และวัฒนธรรม',
+  },
+}
+
+// ฉายาสำรองเมื่อยังไม่มีข้อมูล
+const FALLBACK: PersonaTemplate = {
+  archetype: 'นักเดินทางเริ่มต้น',
+  tagline: 'เส้นทางเพิ่งเริ่ม',
+  description:
+    'ยังเข้าร่วมกิจกรรมไม่มากพอจะสรุปคาแรกเตอร์ ลองเก็บกิจกรรมหลากด้านเพิ่ม แล้วเรดาร์จะค่อย ๆ เล่าเรื่องของคุณเอง',
+}
+
+// โปรยเพิ่มตาม balance — ทำให้ persona มีมิติ "รอบด้าน vs เชี่ยวเฉพาะทาง"
+function balanceNote(dims: Dims): string {
+  const b = balanceScore(dims)
+  if (b >= 78) return 'โปรไฟล์ของคุณ “รอบด้าน” — แข็งแรงเกือบทุกด้านอย่างสมดุล'
+  if (b <= 45) return 'โปรไฟล์ของคุณ “เชี่ยวเฉพาะทาง” — มีจุดเด่นที่ชัดและโดดออกมา'
+  return 'โปรไฟล์ของคุณผสมผสาน — มีจุดเด่นชัดแต่ยังกระจายหลายด้าน'
+}
+
+export function buildPersona(dims: Dims, hasData: boolean): Persona {
+  if (!hasData) {
+    return {
+      archetype: FALLBACK.archetype,
+      tagline: FALLBACK.tagline,
+      description: FALLBACK.description,
+      emojiKey: 'knowledge',
+    }
+  }
+  const [a, b] = top2(dims)
+  const tpl = PAIR[pairKey(a, b)] ?? FALLBACK
+  return {
+    archetype: tpl.archetype,
+    tagline: tpl.tagline,
+    description: `${tpl.description} ${balanceNote(dims)}`,
+    emojiKey: a,
+  }
+}
