@@ -1,13 +1,18 @@
-// สร้าง path/URL ที่เคารพ base ของ Vite (สำคัญตอน deploy ใต้ subpath เช่น GitHub Pages)
-// React Router (Link/navigate) จัดการ basename ให้เอง — helper นี้ไว้ใช้กับลิงก์นอก router
-// เช่น QR ที่ encode absolute URL หรือ window.open
+// สร้าง path/URL สำหรับลิงก์ที่อยู่ "นอก" React Router (QR ที่ encode absolute URL, window.open)
+// ใช้ HashRouter → route อยู่หลัง # · asset/หน้าเว็บอยู่ใต้ base ของ Vite (เช่น /skill-transcript/)
+// ผลลัพธ์รูปแบบ: <origin><base>#<route>  เช่น https://owldayhouse.com/skill-transcript/#/join/CODE
 
-export function withBase(path: string): string {
-  const base = import.meta.env.BASE_URL.replace(/\/$/, '') // '' หรือ '/up-skill-transcript'
-  const p = path.startsWith('/') ? path : `/${path}`
-  return `${base}${p}`
+function base(): string {
+  return import.meta.env.BASE_URL // ลงท้ายด้วย '/' เสมอ เช่น '/skill-transcript/' หรือ '/'
 }
 
-export function absoluteUrl(path: string): string {
-  return `${window.location.origin}${withBase(path)}`
+/** ลิงก์แบบ relative (ใช้กับ window.open) — /skill-transcript/#/join/CODE */
+export function withBase(route: string): string {
+  const r = route.startsWith('/') ? route : `/${route}`
+  return `${base()}#${r}`
+}
+
+/** ลิงก์แบบเต็ม (ใช้ encode ลง QR) — https://host/skill-transcript/#/join/CODE */
+export function absoluteUrl(route: string): string {
+  return `${window.location.origin}${withBase(route)}`
 }

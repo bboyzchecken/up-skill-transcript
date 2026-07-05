@@ -35,8 +35,7 @@ jobs:
         env:
           VITE_BASE: /${{ github.event.repository.name }}/
 
-      - name: SPA fallback (deep links เช่น /join/CODE)
-        run: cp dist/index.html dist/404.html
+      # ใช้ HashRouter แล้ว → ไม่ต้องมี 404.html/SPA rewrite · static ล้วน
 
       - uses: actions/configure-pages@v5
         with:

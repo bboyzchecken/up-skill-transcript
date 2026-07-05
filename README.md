@@ -24,18 +24,24 @@ npm run dev      # เปิด http://localhost:5173
 npm run build    # typecheck + build production ลง dist/
 ```
 
-## Deploy ฟรี 0 บาท (GitHub Pages)
+## Deploy — static ล้วน 0 บาท
 
-มี GitHub Actions ([`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)) build เป็น static แล้ว deploy
-อัตโนมัติทุกครั้งที่ push `main` → เว็บอยู่ที่ **https://bboyzchecken.github.io/up-skill-transcript/**
+เว็บเป็น **static ทั้งหมด** (ไม่ต้อง runtime/DB) และใช้ **HashRouter** — route อยู่หลัง `#`
+จึงวางในโฟลเดอร์/โดเมน/subpath ไหนก็รันได้ทันที **โดยไม่ต้องตั้ง rewrite rule ที่เซิร์ฟเวอร์**
+(deep link/QR เช่น `.../#/join/CODE` รีเฟรชได้ไม่ 404)
 
-ตั้งครั้งเดียว: ไปที่ **repo → Settings → Pages → Build and deployment → Source = "GitHub Actions"**
-(หลังจากนั้น push แต่ละครั้งจะ deploy ให้เอง · ต้นทุน 0 บาท)
+### เป้าหมาย: `owldayhouse.com/skill-transcript`
 
-- `base` ตั้งอัตโนมัติเป็น `/up-skill-transcript/` ตอน build บน CI (ผ่าน env `VITE_BASE`) — QR/ลิงก์ deep link
-  (`/join/CODE`) ทำงานถูกต้องผ่าน `404.html` fallback
-- โฮสต์อื่นที่ serve ที่ root (Cloudflare Pages `*.pages.dev`, Netlify) ก็ใช้ได้ — มี `public/_redirects` ให้แล้ว
-  ตั้ง build command `npm run build`, output `dist`
+```bash
+npm run build:owl     # = VITE_BASE=/skill-transcript/ vite build
+```
+
+แล้วอัปโหลดทั้งโฟลเดอร์ `dist/` ไปวางใต้ path `/skill-transcript/` ของโฮสต์ — จบ
+(asset ถูก prefix `/skill-transcript/` ให้แล้ว) · ปรับ subpath อื่นได้ด้วย `VITE_BASE=/path/ npm run build`
+
+- เสิร์ฟที่ **root** (custom domain ตรง ๆ / Cloudflare `*.pages.dev`): `npm run build` เฉย ๆ (base `/`)
+- **GitHub Pages** (ทางเลือกฟรี auto-deploy): มี [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)
+  ตั้ง base = `/<repo>/` อัตโนมัติ · ครั้งแรกต้องเปิด **Settings → Pages → Source = "GitHub Actions"**
 
 ## Flow เดโม่ (สคริปต์ 5 นาที)
 
