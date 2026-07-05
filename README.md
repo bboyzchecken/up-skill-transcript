@@ -36,14 +36,16 @@ npm run build    # typecheck + build production ลง dist/
 จึงวางในโฟลเดอร์/โดเมน/subpath ไหนก็รันได้ทันที **โดยไม่ต้องตั้ง rewrite rule ที่เซิร์ฟเวอร์**
 (deep link/QR เช่น `.../#/join/CODE` รีเฟรชได้ไม่ 404)
 
-### เป้าหมาย: `owldayhouse.com/skill-transcript`
+### เป้าหมาย: `owldayhouse.com/up-skill-transcript`
 
 ```bash
-npm run build:owl     # = VITE_BASE=/skill-transcript/ vite build
+npm run build:owl     # = VITE_BASE=/up-skill-transcript/ vite build
 ```
 
-แล้วอัปโหลดทั้งโฟลเดอร์ `dist/` ไปวางใต้ path `/skill-transcript/` ของโฮสต์ — จบ
-(asset ถูก prefix `/skill-transcript/` ให้แล้ว) · ปรับ subpath อื่นได้ด้วย `VITE_BASE=/path/ npm run build`
+แล้วอัปโหลด **ทั้งโฟลเดอร์ `dist/`** (index.html + assets/ + favicon.svg) ไปวางใต้ path
+`/up-skill-transcript/` ของโฮสต์ — จบ (asset ถูก prefix `/up-skill-transcript/` ให้แล้ว)
+⚠️ base ต้อง **ตรงกับชื่อโฟลเดอร์บนเซิร์ฟเวอร์เป๊ะ ๆ** ไม่งั้น asset จะ 404 = จอขาว ·
+ถ้าย้าย subpath อื่น build ใหม่ด้วย `VITE_BASE=/ชื่อโฟลเดอร์/ vite build`
 
 - เสิร์ฟที่ **root** (custom domain ตรง ๆ / Cloudflare `*.pages.dev`): `npm run build` เฉย ๆ (base `/`)
 - **GitHub Pages** (ทางเลือกฟรี auto-deploy): [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)
